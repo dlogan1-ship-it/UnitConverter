@@ -6,32 +6,47 @@ namespace UnitConverter.Pages;
 public class ConversionsModel : PageModel
 {
     [BindProperty(SupportsGet = true)]
-    public string ConversionType { get; set; } = string.Empty;
+    public ConversionModel Conversion { get; set; } = new();
 
     [BindProperty(SupportsGet = true)]
-    public string Input { get; set; } = string.Empty;
+    public string ConversionType
+    {
+        get => Conversion.ConversionType;
+        set => Conversion.ConversionType = value;
+    }
 
-    public string Output { get; set; } = string.Empty;
+    [BindProperty(SupportsGet = true)]
+    public string Input
+    {
+        get => Conversion.Input;
+        set => Conversion.Input = value;
+    }
+
+    public string Output
+    {
+        get => Conversion.Output;
+        set => Conversion.Output = value;
+    }
 
     public void OnGet()
     {
         ViewData["Title"] = "Conversions";
 
-        if (string.IsNullOrEmpty(ConversionType))
+        if (string.IsNullOrEmpty(Conversion.ConversionType))
         {
-            ConversionType = "MilesToKilometers";
-            ViewData["ConversionType"] = "Miles to Kilometers";
+            Conversion.ConversionType = ConversionTypes.MilesToKilometers;
+            ViewData["ConversionType"] = ConversionTypes.All[ConversionTypes.MilesToKilometers];
         }
 
-        if (string.IsNullOrEmpty(Input))
+        if (string.IsNullOrEmpty(Conversion.Input))
         {
-            Input = "3.1415";
+            Conversion.Input = "3.1415";
         }
 
         double value;
         try
         {
-            value = Convert.ToDouble(Input);
+            value = Convert.ToDouble(Conversion.Input);
         }
         catch (FormatException)
         {
@@ -42,16 +57,16 @@ public class ConversionsModel : PageModel
         double? result;
         try
         {
-            result = ConversionType switch
+            result = Conversion.ConversionType switch
             {
-                "MilesToKilometers" => new UnitOf.Length().FromMiles(value).ToKilometers(),
-                "KilometersToMiles" => new UnitOf.Length().FromKilometers(value).ToMiles(),
-                "FahrenheitToCelsius" => new UnitOf.Temperature().FromFahrenheit(value).ToCelsius(),
-                "CelsiusToFahrenheit" => new UnitOf.Temperature().FromCelsius(value).ToFahrenheit(),
-                "PoundsToKilograms" => new UnitOf.Mass().FromPounds(value).ToKilograms(),
-                "KilogramsToPounds" => new UnitOf.Mass().FromKilograms(value).ToPounds(),
-                "GallonsToLiters" => new UnitOf.Volume().FromGallonsUS(value).ToLiters(),
-                "AcresToHectares" => new UnitOf.Area().FromAcres(value).ToHectares(),
+                ConversionTypes.MilesToKilometers => new UnitOf.Length().FromMiles(value).ToKilometers(),
+                ConversionTypes.KilometersToMiles => new UnitOf.Length().FromKilometers(value).ToMiles(),
+                ConversionTypes.FahrenheitToCelsius => new UnitOf.Temperature().FromFahrenheit(value).ToCelsius(),
+                ConversionTypes.CelsiusToFahrenheit => new UnitOf.Temperature().FromCelsius(value).ToFahrenheit(),
+                ConversionTypes.PoundsToKilograms => new UnitOf.Mass().FromPounds(value).ToKilograms(),
+                ConversionTypes.KilogramsToPounds => new UnitOf.Mass().FromKilograms(value).ToPounds(),
+                ConversionTypes.GallonsToLiters => new UnitOf.Volume().FromGallonsUS(value).ToLiters(),
+                ConversionTypes.AcresToHectares => new UnitOf.Area().FromAcres(value).ToHectares(),
                 _ => (double?)null
             };
         }
@@ -67,6 +82,6 @@ public class ConversionsModel : PageModel
             return;
         }
 
-        Output = result.Value.ToString();
+        Conversion.Output = result.Value.ToString();
     }
 }
