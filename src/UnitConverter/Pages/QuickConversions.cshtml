@@ -4,6 +4,7 @@
 <h1>Quick Conversions</h1>
 
 <form method="get" asp-page-handler="@ConversionTypes.MilesToKilometers">
+    <input type="hidden" name="handler" value="@ConversionTypes.MilesToKilometers" />
     <div class="mb-3">
         <label for="miles" class="form-label">Miles</label>
         <input id="miles" name="input" type="text" class="form-control" />
@@ -12,6 +13,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.KilometersToMiles">
+    <input type="hidden" name="handler" value="@ConversionTypes.KilometersToMiles" />
     <div class="mb-3">
         <label for="kilometers" class="form-label">Kilometers</label>
         <input id="kilometers" name="input" type="number" step="any" class="form-control" />
@@ -20,6 +22,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.FahrenheitToCelsius">
+    <input type="hidden" name="handler" value="@ConversionTypes.FahrenheitToCelsius" />
     <div class="mb-3">
         <label for="fahrenheit" class="form-label">Degrees Fahrenheit</label>
         <textarea id="fahrenheit" name="input" class="form-control"></textarea>
@@ -28,6 +31,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.CelsiusToFahrenheit">
+    <input type="hidden" name="handler" value="@ConversionTypes.CelsiusToFahrenheit" />
     <div class="mb-3">
         <label for="celsius" class="form-label">Degrees Celsius (-50 to 50)</label>
         <input id="celsius" name="input" type="range" min="-50" max="50" class="form-range" />
@@ -36,6 +40,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.PoundsToKilograms">
+    <input type="hidden" name="handler" value="@ConversionTypes.PoundsToKilograms" />
     <div class="mb-3">
         <label for="pounds" class="form-label">Pounds</label>
         <select id="pounds" name="input" asp-items="Model.PoundOptions" class="form-select"></select>
@@ -44,6 +49,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.KilogramsToPounds">
+    <input type="hidden" name="handler" value="@ConversionTypes.KilogramsToPounds" />
     <div class="mb-3">
         <label for="kilograms" class="form-label">Kilograms</label>
         <input id="kilograms" name="input" type="number" step="any" class="form-control" />
@@ -52,6 +58,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.GallonsToLiters">
+    <input type="hidden" name="handler" value="@ConversionTypes.GallonsToLiters" />
     <div class="mb-3">
         <label for="gallons" class="form-label">Gallons</label>
         <input id="gallons" name="input" type="number" step="any" class="form-control" />
@@ -60,6 +67,7 @@
 </form>
 
 <form method="get" asp-page-handler="@ConversionTypes.AcresToHectares">
+    <input type="hidden" name="handler" value="@ConversionTypes.AcresToHectares" />
     <div class="mb-3">
         <label for="acres" class="form-label">Acres</label>
         <input id="acres" name="input" type="number" step="any" class="form-control" />
