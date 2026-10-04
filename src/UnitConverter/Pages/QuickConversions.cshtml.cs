@@ -1,12 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
+using UnitConverter.Models;
+using UnitConverter.Services;
 
 namespace UnitConverter.Pages;
 
 public class QuickConversionsModel : PageModel
 {
+    private readonly IConversionService _conversionService;
+
+    public QuickConversionsModel(IConversionService conversionService)
+    {
+        _conversionService = conversionService;
+    }
+
     public IEnumerable<SelectListItem> PoundOptions =>
     [
         new("1 pound", "1"),
@@ -16,36 +24,53 @@ public class QuickConversionsModel : PageModel
         new("50 pounds", "50")
     ];
 
+    public string? Output { get; private set; }
+    public string? ErrorMessage { get; private set; }
+
     public IActionResult OnGetMilesToKilometers(string input) =>
-        RedirectToConversion(ConversionTypes.MilesToKilometers, input);
+        PerformConversion(input, ConversionTypes.MilesToKilometers);
 
     public IActionResult OnGetKilometersToMiles(string input) =>
-        RedirectToConversion(ConversionTypes.KilometersToMiles, input);
+        PerformConversion(input, ConversionTypes.KilometersToMiles);
 
     public IActionResult OnGetFahrenheitToCelsius(string input) =>
-        RedirectToConversion(ConversionTypes.FahrenheitToCelsius, input);
+        PerformConversion(input, ConversionTypes.FahrenheitToCelsius);
 
     public IActionResult OnGetCelsiusToFahrenheit(string input) =>
-        RedirectToConversion(ConversionTypes.CelsiusToFahrenheit, input);
+        PerformConversion(input, ConversionTypes.CelsiusToFahrenheit);
 
     public IActionResult OnGetPoundsToKilograms(string input) =>
-        RedirectToConversion(ConversionTypes.PoundsToKilograms, input);
+        PerformConversion(input, ConversionTypes.PoundsToKilograms);
 
     public IActionResult OnGetKilogramsToPounds(string input) =>
-        RedirectToConversion(ConversionTypes.KilogramsToPounds, input);
+        PerformConversion(input, ConversionTypes.KilogramsToPounds);
 
     public IActionResult OnGetGallonsToLiters(string input) =>
-        RedirectToConversion(ConversionTypes.GallonsToLiters, input);
+        PerformConversion(input, ConversionTypes.GallonsToLiters);
 
     public IActionResult OnGetAcresToHectares(string input) =>
-        RedirectToConversion(ConversionTypes.AcresToHectares, input);
+        PerformConversion(input, ConversionTypes.AcresToHectares);
 
-    private RedirectToPageResult RedirectToConversion(string conversionType, string input)
+    private IActionResult PerformConversion(string input, string conversionType)
     {
-        return RedirectToPage("/Conversions", new RouteValueDictionary
+        if (!decimal.TryParse(input, out var value))
         {
-            ["Conversion.ConversionType"] = conversionType,
-            ["Conversion.Input"] = input
-        });
+            ErrorMessage = "Please enter a valid number.";
+            return Page();
+        }
+
+        decimal result;
+        try
+        {
+            result = _conversionService.Convert(value, conversionType);
+        }
+        catch (ArgumentException)
+        {
+            ErrorMessage = "That conversion attempt was stupid, I will not attempt it.";
+            return Page();
+        }
+
+        Output = result.ToString();
+        return Page();
     }
 }
