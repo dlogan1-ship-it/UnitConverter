@@ -1,0 +1,89 @@
+@page
+@using UnitConverter.Models
+@model LogsModel
+
+@{
+    ViewData["Title"] = "Application Logs";
+}
+
+<h1>Application Logs</h1>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-md-4">
+        <label asp-for="Search" class="form-label">Search</label>
+        <input asp-for="Search" class="form-control" type="search" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Level" class="form-label">Level</label>
+        <select asp-for="Level" class="form-select">
+            <option value="">All</option>
+            <option value="Information">Information</option>
+            <option value="Warning">Warning</option>
+            <option value="Error">Error</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="ConversionType" class="form-label">Conversion</label>
+        <select asp-for="ConversionType" class="form-select">
+            <option value="">All</option>
+            @foreach (var conversion in ConversionTypes.All)
+            {
+                <option value="@conversion.Key">@conversion.Value</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-page="/Logs" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (Model.Entries.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        No log entries match the selected filters.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <caption>@Model.Entries.Count matching log entries</caption>
+            <thead>
+            <tr>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Level</th>
+                <th scope="col">Message</th>
+                <th scope="col">Conversion</th>
+                <th scope="col">Input</th>
+                <th scope="col">Result</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var entry in Model.Entries)
+            {
+                <tr>
+                    <td>@entry.Timestamp</td>
+                    <td>@entry.Level</td>
+                    <td>
+                        @entry.Message
+                        @if (!string.IsNullOrEmpty(entry.Exception))
+                        {
+                            <details>
+                                <summary>Exception details</summary>
+                                <pre class="small">@entry.Exception</pre>
+                            </details>
+                        }
+                    </td>
+                    <td>@entry.ConversionType</td>
+                    <td>@entry.Input</td>
+                    <td>@entry.Result</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

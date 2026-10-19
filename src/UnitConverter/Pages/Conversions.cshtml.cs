@@ -1,11 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging.Abstractions;
 using UnitConverter.Models;
 
 namespace UnitConverter.Pages;
 
 public class ConversionsModel : PageModel
 {
+    private readonly ILogger<ConversionsModel> _logger;
+
+    public ConversionsModel()
+        : this(NullLogger<ConversionsModel>.Instance)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ConversionsModel(ILogger<ConversionsModel> logger)
+    {
+        _logger = logger;
+    }
+
     [BindProperty(SupportsGet = true)]
     public ConversionModel Conversion { get; set; } = new();
 
@@ -44,6 +58,11 @@ public class ConversionsModel : PageModel
             Conversion.Input = "3.1415";
         }
 
+        _logger.LogInformation(
+            "Conversion requested for {Input} using {ConversionType}",
+            Conversion.Input,
+            Conversion.ConversionType);
+
         double value;
         try
         {
@@ -51,6 +70,11 @@ public class ConversionsModel : PageModel
         }
         catch (FormatException)
         {
+            _logger.LogWarning(
+                "Invalid conversion input {Input} for {ConversionType}",
+                Conversion.Input,
+                Conversion.ConversionType);
+
             ViewData["ErrorMessage"] = "Input must be a valid number.";
             return;
         }
@@ -71,18 +95,35 @@ public class ConversionsModel : PageModel
                 _ => (double?)null
             };
         }
-        catch (ArgumentException)
+        catch (ArgumentException ex)
         {
+            _logger.LogError(
+                ex,
+                "Conversion failed for {Input} using {ConversionType}",
+                value,
+                Conversion.ConversionType);
+
             ViewData["ErrorMessage"] = "The conversion could not be completed.";
             return;
         }
 
         if (result is null)
         {
+            _logger.LogWarning(
+                "Unknown conversion type {ConversionType} requested for {Input}",
+                Conversion.ConversionType,
+                value);
+
             ViewData["ErrorMessage"] = "Unknown conversion type.";
             return;
         }
 
         Conversion.Output = result.Value.ToString();
+
+        _logger.LogInformation(
+            "Converted {Input} using {ConversionType} with result {Result}",
+            value,
+            Conversion.ConversionType,
+            result.Value);
     }
 }

@@ -9,10 +9,14 @@ namespace UnitConverter.Pages;
 public class QuickConversionsModel : PageModel
 {
     private readonly IConversionService _conversionService;
+    private readonly ILogger<QuickConversionsModel> _logger;
 
-    public QuickConversionsModel(IConversionService conversionService)
+    public QuickConversionsModel(
+        IConversionService conversionService,
+        ILogger<QuickConversionsModel> logger)
     {
         _conversionService = conversionService;
+        _logger = logger;
     }
 
     public IEnumerable<SelectListItem> PoundOptions =>
@@ -53,8 +57,28 @@ public class QuickConversionsModel : PageModel
 
     private IActionResult PerformConversion(string input, string conversionType)
     {
+        _logger.LogInformation(
+            "Conversion requested for {Input} using {ConversionType}",
+            input,
+            conversionType);
+
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            _logger.LogWarning(
+                "Conversion input was missing for {ConversionType}",
+                conversionType);
+
+            ErrorMessage = "Please enter a valid number.";
+            return Page();
+        }
+
         if (!decimal.TryParse(input, out var value))
         {
+            _logger.LogWarning(
+                "Invalid conversion input {Input} for {ConversionType}",
+                input,
+                conversionType);
+
             ErrorMessage = "Please enter a valid number.";
             return Page();
         }
@@ -64,11 +88,23 @@ public class QuickConversionsModel : PageModel
         {
             result = _conversionService.Convert(value, conversionType);
         }
-        catch (ArgumentException)
+        catch (ArgumentException ex)
         {
+            _logger.LogError(
+                ex,
+                "Conversion failed for {Input} using {ConversionType}",
+                value,
+                conversionType);
+
             ErrorMessage = "That conversion attempt was stupid, I will not attempt it.";
             return Page();
         }
+
+        _logger.LogInformation(
+            "Converted {Input} using {ConversionType} with result {Result}",
+            value,
+            conversionType,
+            result);
 
         Output = result.ToString();
         return Page();

@@ -31,3 +31,5 @@ appsettings.*.local.json
 
 # Zip files from git archive
 *.zip
+# Generated Serilog log files (keep the Logs folder itself)
+src/UnitConverter/Logs/*.json
